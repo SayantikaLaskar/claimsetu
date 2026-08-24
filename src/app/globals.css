@@ -1,0 +1,118 @@
+@import "tailwindcss";
+
+/*
+ * Design tokens.
+ *
+ * The restraint here is deliberate. An earlier pass washed whole cards in
+ * severity colour, which turned a page with seven findings into seven competing
+ * alerts and made none of them legible. Severity now carries on a thin rule and
+ * a small label; the surfaces stay neutral. One accent, used sparingly.
+ *
+ * Constraints from the brief: a mid-range Android phone, possibly 3G, possibly a
+ * reader who is not fluent in the script. So high contrast throughout, nothing
+ * signalled by colour alone, 44px targets, and no dependence on hover.
+ *
+ * Not saffron/white/green, and no emblem — this must never read as an official
+ * Government of India service.
+ */
+
+:root {
+  --ink: #131a1e;
+  --ink-soft: #4a565d;
+  --ink-faint: #77848b;
+  --paper: #fcfcfb;
+  --card: #ffffff;
+  --sunken: #f5f5f3;
+  --line: #e6e6e2;
+  --line-strong: #cfd3d0;
+
+  --brand: #0d5750;
+  --brand-ink: #093c37;
+  --brand-wash: #eef4f3;
+
+  --stop: #a52a1e;
+  --warn: #855000;
+  --go: #1a5c33;
+  --note: #33487a;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --ink: #eef1f0;
+    --ink-soft: #a9b5b2;
+    --ink-faint: #7d8b88;
+    --paper: #0b0f11;
+    --card: #12181b;
+    --sunken: #171e21;
+    --line: #242e32;
+    --line-strong: #38454a;
+
+    --brand: #5cb3a9;
+    --brand-ink: #9dd8d0;
+    --brand-wash: #0f2124;
+
+    --stop: #ef8b80;
+    --warn: #dfae68;
+    --go: #79cf95;
+    --note: #a3bce6;
+  }
+}
+
+@theme inline {
+  --color-ink: var(--ink);
+  --color-ink-soft: var(--ink-soft);
+  --color-ink-faint: var(--ink-faint);
+  --color-paper: var(--paper);
+  --color-card: var(--card);
+  --color-sunken: var(--sunken);
+  --color-line: var(--line);
+  --color-line-strong: var(--line-strong);
+  --color-brand: var(--brand);
+  --color-brand-ink: var(--brand-ink);
+  --color-brand-wash: var(--brand-wash);
+  --color-stop: var(--stop);
+  --color-warn: var(--warn);
+  --color-go: var(--go);
+  --color-note: var(--note);
+  --font-sans: var(--font-noto), ui-sans-serif, system-ui, sans-serif;
+
+  --radius-card: 0.625rem;
+}
+
+html {
+  /* Steps up on phones rather than down — this audience zooms. */
+  font-size: 17px;
+  -webkit-text-size-adjust: 100%;
+}
+@media (min-width: 640px) {
+  html { font-size: 16px; }
+}
+
+body {
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-sans);
+  text-wrap: pretty;
+  font-feature-settings: "cv05", "ss01";
+}
+
+/* Every interactive target clears 44px without each component restating it. */
+button, a[role="button"], summary { min-height: 2.75rem; }
+
+*:focus-visible {
+  outline: 2.5px solid var(--brand);
+  outline-offset: 2px;
+  border-radius: 3px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+@media print {
+  .no-print { display: none !important; }
+  body { background: #fff; color: #000; }
+}
