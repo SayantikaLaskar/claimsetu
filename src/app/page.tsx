@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Button, Card, Label, Note } from "@/components/ui";
+import { Card, Label, Note } from "@/components/ui";
 import { RULES } from "@/lib/engine/rules";
 
 /**

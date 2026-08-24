@@ -540,7 +540,7 @@ const notEpsRule: Rule = {
   id: "ELIG_NOT_EPS_MEMBER",
   label: "Enrolled in the pension scheme",
   appliesTo: ["FORM_10C", "FORM_10D"],
-  evaluate: (p, c, ctx) => {
+  evaluate: (p) => {
     if (p.spells.some((s) => s.epsMember)) return null;
     return {
       ruleId: "ELIG_NOT_EPS_MEMBER",

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useSyncExternalStore } from "react";
 import { SPEECH_LANG } from "@/lib/speech";
 import type { Locale } from "@/lib/i18n";
 
@@ -22,13 +22,19 @@ export function SpeakButton({
   label?: string;
   className?: string;
 }) {
-  const [available, setAvailable] = useState(false);
+  // Capability detection is a read of an external system, not state to sync into
+  // an effect. The server snapshot is false so the button is absent until the
+  // client confirms it will work — a dead control is worse than no control for
+  // someone relying on it.
+  const available = useSyncExternalStore(
+    () => () => {},
+    () => "speechSynthesis" in window,
+    () => false,
+  );
   const [speaking, setSpeaking] = useState(false);
 
-  useEffect(() => {
-    setAvailable(typeof window !== "undefined" && "speechSynthesis" in window);
-    return () => window.speechSynthesis?.cancel();
-  }, []);
+  // Stop any utterance still playing when this leaves the page.
+  useEffect(() => () => window.speechSynthesis?.cancel(), []);
 
   if (!available) return null;
 

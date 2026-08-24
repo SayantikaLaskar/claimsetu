@@ -60,7 +60,6 @@ export function compareNames(a: string, b: string): NameVerdict {
   if (ta.join(" ") === tb.join(" ")) return "EXACT";
   if (ta.length === 0 || tb.length === 0) return "DIFFERENT";
 
-  const setA = new Set(ta);
   const setB = new Set(tb);
   const shared = ta.filter((t) => setB.has(t));
 

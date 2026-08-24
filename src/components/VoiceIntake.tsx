@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { useRouter } from "next/navigation";
 import { SPEECH_LANG, matchIntent } from "@/lib/speech";
 import { needById } from "@/lib/needs";
@@ -19,6 +19,14 @@ interface SpeechRecognitionLike {
 }
 type RecognitionCtor = new () => SpeechRecognitionLike;
 
+function recognitionCtor(): RecognitionCtor | undefined {
+  const w = window as unknown as {
+    SpeechRecognition?: RecognitionCtor;
+    webkitSpeechRecognition?: RecognitionCtor;
+  };
+  return w.SpeechRecognition ?? w.webkitSpeechRecognition;
+}
+
 /**
  * Speak instead of reading.
  *
@@ -31,20 +39,22 @@ export function VoiceIntake({ locale }: { locale: Locale }) {
   const router = useRouter();
   const recognition = useRef<SpeechRecognitionLike | null>(null);
 
-  const [supported, setSupported] = useState(false);
   const [listening, setListening] = useState(false);
   const [transcript, setTranscript] = useState("");
   const [error, setError] = useState("");
 
+  // Whether the browser can hear at all is a property of the platform, read
+  // directly rather than mirrored into state through an effect.
+  const supported = useSyncExternalStore(
+    () => () => {},
+    () => Boolean(recognitionCtor()),
+    () => false,
+  );
+
   useEffect(() => {
-    const w = window as unknown as {
-      SpeechRecognition?: RecognitionCtor;
-      webkitSpeechRecognition?: RecognitionCtor;
-    };
-    const Ctor = w.SpeechRecognition ?? w.webkitSpeechRecognition;
+    const Ctor = recognitionCtor();
     if (!Ctor) return;
 
-    setSupported(true);
     const r = new Ctor();
     r.lang = SPEECH_LANG[locale];
     r.continuous = false;
