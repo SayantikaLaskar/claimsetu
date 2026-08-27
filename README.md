@@ -166,35 +166,46 @@ the member's language; the submission is in theirs.
 
 ---
 
-## How Codex helped
+## How this was built
 
-Codex was the build tool for this project, and it mattered most in three places:
+Built with an AI coding agent, working from the published EPFO material. The work that
+actually mattered, and would have taken a week by hand:
 
 - **Codifying the rule catalogue.** Turning 26 scattered rejection causes — spread
   across scheme paragraphs, circulars, and the literal error strings EPFO returns —
   into one typed, uniform catalogue where every entry carries severity, responsible
-  actor, realistic fix time and a citation. This is the part that would have been a
-  week of transcription and was the difference between a chatbot and an engine.
+  actor, realistic fix time and a citation. This is the difference between a chatbot
+  and an engine.
 - **The parameterised translation layer.** The engine builds its prose inline, so
   switching language originally translated the buttons and left every explanation in
   English. Threading `params` through all 26 rules, writing the Hindi catalogue, and
-  building an audit that fails the build on any untranslated finding was a mechanical
-  refactor across the whole codebase.
+  building an audit that fails on any untranslated finding was a refactor across the
+  whole codebase.
 - **The design pass.** Extracting layout primitives and retiring a colour system where
   severity washed entire cards — which turned a page of seven findings into seven
   competing alarms — then propagating that across eleven routes.
 
-Two real bugs surfaced during that work and are worth naming: the claim tracker was
-marking day-27 claims **settled**, so the escalation path never appeared (the same
-lie the real portal tells), and retiring the `-wash` colour tokens left 13 stale class
-references that Tailwind silently compiles to nothing.
+Four bugs are worth naming, because they are the kind a demo hides. The claim tracker
+was marking day-27 claims **settled**, so the escalation path never appeared — the same
+lie the real portal tells. Retiring the `-wash` colour tokens left 13 stale class
+references that Tailwind silently compiles to nothing. Two components detected browser
+speech support with `setState` inside an effect, which React now flags as a cascading
+render. And the passbook did not reconcile with the stated balances until the balance was
+made a derived value — `npm test` now asserts that for every member.
 
 ## How an OpenAI model raises the ceiling
 
-This prototype **runs no inference**. Voice uses the browser's own speech engine, so
-it is free, needs no key, and works on-device. That is a design position, not a budget
-constraint — but four jobs are genuinely limited today, and each is exactly what a
-model is for. `src/lib/openai.ts` holds a working client for all of them.
+This prototype **runs no inference at any point**. Voice uses the browser's own speech
+engine, so it is free, needs no key, and works on-device. Every verdict comes from the
+rule catalogue.
+
+That is a design position, not a budget constraint: a citizen told *"your claim will be
+rejected"* acts on that for three weeks, and it has to trace to a written rule rather
+than a sampled token. But four jobs below are genuinely limited today, and each is
+exactly what a model is for. `src/lib/openai.ts` is a complete, tested-by-hand client
+for all four — Responses, transcription and speech — and is deliberately **not wired
+into any route**, so nothing in the running app can call out. Wiring it up is the next
+step, not a missing one.
 
 | Job | Model | Limitation today | Cost |
 |---|---|---|---|
